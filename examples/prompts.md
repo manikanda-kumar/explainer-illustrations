@@ -1,6 +1,6 @@
 # Prompt examples
 
-Copy these prompts into your agent session. Image generation is delegated to Codex, Grok Build, or Agy harness workers — not called directly.
+Copy these prompts into your agent session. Image generation is delegated to Grok Build, Agy, Claude Code, or Codex harness workers — not called directly.
 
 ## Shot list only (no generation)
 
@@ -39,12 +39,32 @@ English labels only. Delegate to Agy harness via use-harness with --write. Use g
 <paste article>
 ```
 
-## Code imagegen (Codex harness)
+## Code imagegen (Claude Code harness — SVG)
 
 ```text
 Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
-Delegate to Codex harness via use-harness with --write.
-Build HTML/SVG, render to PNG. Labels must be exact English.
+Delegate to Claude Code harness via use-harness with --write.
+Build SVG/HTML, render to PNG. Labels must be exact English. Use claude code — native prompting only.
+
+<paste article>
+```
+
+## Codex Imagine (native image_gen — raster)
+
+```text
+Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Delegate to Codex harness via use-harness with --write. Use codex imagine.
+Call built-in image_gen (not SVG). English labels, 16:9.
+
+<paste article>
+```
+
+## Code imagegen (Codex harness — SVG only, explicit)
+
+```text
+Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Delegate to Codex harness via use-harness with --write. Use codex code / SVG path.
+Build HTML/SVG, render to PNG. Do not use image_gen. Labels must be exact English.
 
 <paste article>
 ```
@@ -100,12 +120,13 @@ Delegate to Agy harness via use-harness with --write.
 
 ```bash
 export EXPLAINER_IMAGE_BACKEND=code
+export EXPLAINER_CODE_HARNESS=claude   # or codex
 SKILL_DIR="$(./scripts/harness-dir.sh)"
 ```
 
 ```text
 Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
-Backend is code — delegate to Codex harness with --write.
+Backend is code — delegate to Claude Code harness with --write (SVG, no image model).
 ```
 
 ## Manual harness invocation (orchestrator pattern)

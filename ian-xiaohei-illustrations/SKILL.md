@@ -1,6 +1,6 @@
 ---
 name: ian-xiaohei-illustrations
-description: Generate Ian-style body illustrations for articles. Use when the user asks for "Inky", "Xiaohei" (legacy alias), "hand-drawn", "weird/whimsical", "body illustration", "article illustration", "illustration advice", "shot list", "explainer illustration", or "remove-title / edit image" tasks for an article, post, blog, Notion doc, workflow doc, methodology, process, structure, state, metaphor, or argument. Default visual IP is Inky — pure-white hand-drawn line art, sparse red/orange/blue English annotations, clean but imaginative. Delegates image generation to Codex, Grok Build, or Agy harness workers via use-harness (never direct image_gen/CLI from the orchestrator).
+description: Generate Ian-style body illustrations for articles. Use when the user asks for "Inky", "Xiaohei" (legacy alias), "hand-drawn", "weird/whimsical", "body illustration", "article illustration", "illustration advice", "shot list", "explainer illustration", or "remove-title / edit image" tasks for an article, post, blog, Notion doc, workflow doc, methodology, process, structure, state, metaphor, or argument. Default visual IP is Inky — pure-white hand-drawn line art, sparse red/orange/blue English annotations, clean but imaginative. Delegates image generation to Grok Build, Agy, Claude Code, or Codex harness workers via use-harness (never direct image_gen/CLI from the orchestrator).
 ---
 
 # Explainer Illustrations (Inky)
@@ -8,8 +8,8 @@ description: Generate Ian-style body illustrations for articles. Use when the us
 ## Hard rules (always)
 
 1. **English only.** Every response, shot list, and embedded label inside images is English. The source article may be any language; illustrations and your prose are English.
-2. **Delegate all image generation via bundled `use-harness`.** Load `<repo>/use-harness/SKILL.md` (shipped in this repository). The orchestrator plans and assigns; harness workers generate. **Never** call `image_gen`, `agy`, or `codex` directly from this agent.
-3. **Backend → harness:** `grok-imagine` → `--harness grok`; `gemini-nano-banana` → `--harness agy --write`; `code` → `--harness codex --write`. Use `--task implement` (not `--task image`). See `references/harness-delegation.md`.
+2. **Delegate all image generation via bundled `use-harness`.** Load `<repo>/use-harness/SKILL.md` (shipped in this repository). The orchestrator plans and assigns; harness workers generate. **Never** call `image_gen`, `agy`, `claude`, or `codex` directly from this agent (never `claude -p`).
+3. **Backend → harness:** `grok-imagine` → `--harness grok`; `gemini-nano-banana` → `--harness agy --write`; `codex-imagine` → `--harness codex --write` (native `image_gen`); `code` → `--harness claude --write` (SVG only; codex SVG only when explicit). Claude routes via native tmux bridge — never `claude -p`. Use `--task implement` (not `--task image`). See `references/harness-delegation.md`.
 4. **One image per harness invocation** (default). Do not stitch multiple illustrations into a single image.
 
 ## Core positioning
@@ -64,7 +64,8 @@ Before generating, pick a backend per `references/image-gen-backends.md`:
 
 | User says | Backend |
 |-----------|---------|
-| "code imagegen", "generate with code", "HTML/SVG" | `code` |
+| "code imagegen", "generate with code", "HTML/SVG", "claude code" | `code` (harness `claude`; codex only for "codex svg/code") |
+| "codex imagegen", "codex imagine", "gpt image" | `codex-imagine` (native `image_gen` — not SVG) |
 | "grok imagine", "use image_gen", "imagine" | `grok-imagine` |
 | "nano banana", "gemini", "agy" | `gemini-nano-banana` |
 
@@ -78,20 +79,20 @@ If the user clearly asks to generate, do not stop to confirm. For each image:
 
 1. Fill `references/prompt-template.md` for that shot.
 2. Build a worker assignment per `references/harness-delegation.md`.
-3. Run `run-harness.mjs` with the mapped harness (`grok`, `agy`, or `codex`).
+3. Run `run-harness.mjs` with the mapped harness (`grok`, `agy`, `claude`, or `codex`).
 4. Verify the PNG exists at the declared path; check `.harness/runs/<run_id>/` on failure.
 
 ```bash
 SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
 node "$SKILL_DIR/scripts/run-harness.mjs" \
-  --harness <grok|agy|codex> \
+  --harness <grok|agy|claude|codex> \
   --task implement \
   --prompt "<worker assignment>" \
   --cwd "<workspace>" \
   [--model "Gemini 3.1 Pro (High)"] \
   [--write] \
   --json
-# --write required for agy and codex when saving PNGs
+# --write required for agy, claude, and codex when saving PNGs
 ```
 
 Each worker assignment must include the image spec:

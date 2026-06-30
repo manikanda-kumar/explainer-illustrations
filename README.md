@@ -64,7 +64,8 @@ The orchestrating agent **does not** call image tools directly. It delegates to 
 |---------|----------------|-------------|
 | **`grok-imagine`** | `grok` (Grok Build) | `image_gen` / `image_edit` |
 | **`gemini-nano-banana`** | `agy` (Antigravity) | `agy -p` + Gemini image model |
-| **`code`** | `codex` | HTML/CSS/SVG → PNG |
+| **`codex-imagine`** | `codex` | built-in `image_gen` (GPT Image 2) |
+| **`code`** | `claude` (or `codex` for SVG only) | SVG/HTML → PNG — no image model |
 
 Pick a backend by telling the agent, or set `EXPLAINER_IMAGE_BACKEND`.
 
@@ -141,7 +142,7 @@ git clone https://github.com/manikanda-kumar/explainer-illustrations.git
 cd explainer-illustrations
 ```
 
-Verify harness CLIs (you need at least one of `grok`, `agy`, or `codex` on PATH):
+Verify harness CLIs (you need at least one of `grok`, `agy`, `claude`, or `codex` on PATH):
 
 ```bash
 node ./use-harness/scripts/run-harness.mjs doctor --json
@@ -170,7 +171,8 @@ SKILL_DIR="$(./scripts/harness-dir.sh)"
 Optional environment:
 
 ```bash
-export EXPLAINER_IMAGE_BACKEND=grok-imagine   # or gemini-nano-banana, code
+export EXPLAINER_IMAGE_BACKEND=grok-imagine   # or gemini-nano-banana, codex-imagine, code
+export EXPLAINER_CODE_HARNESS=claude          # when backend=code: claude (default) or codex (SVG only)
 # Only if not using the bundled copy or scripts/harness-dir.sh:
 # export USE_HARNESS_SKILL_DIR="/path/to/explainer-illustrations/use-harness"
 ```

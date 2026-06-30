@@ -1,10 +1,10 @@
 # Harness delegation (use-harness)
 
-The **orchestrator** (the agent running this skill) plans shot lists and delegates **every image generation** to a harness worker via the `use-harness` skill. Workers call `image_gen`, `agy`, or Codex — the orchestrator does not.
+The **orchestrator** (the agent running this skill) plans shot lists and delegates **every image generation** to a harness worker via the `use-harness` skill. Workers call `image_gen` (Grok/Codex), `agy`, or build SVG/HTML (Claude `code` path) — the orchestrator does not.
 
 ## Hard rules
 
-1. **Never** call `image_gen`, `image_edit`, `agy`, or `codex` directly from the orchestrator.
+1. **Never** call `image_gen`, `image_edit`, `agy`, `claude`, or `codex` directly from the orchestrator (including `claude -p`).
 2. **Always** route through the **bundled** `use-harness` skill in this repo (`<repo>/use-harness`). Override with `USE_HARNESS_SKILL_DIR` only when needed.
 3. Use `--task implement` — **`--task image` is rejected** by the harness router.
 4. **One harness invocation per illustration.** Run sequentially unless the user asks for parallel Grok runs.
@@ -33,7 +33,8 @@ node "$SKILL_DIR/scripts/run-harness.mjs" backends --json
 |------------|----------------------|-------------|
 | `grok-imagine` | `grok` | `image_gen` / `image_edit` + `imagine` skill |
 | `gemini-nano-banana` | `agy` | `agy -p` with Gemini image model |
-| `code` | `codex` | HTML/CSS/SVG → PNG render |
+| `codex-imagine` | `codex` | built-in `image_gen` (imagegen skill) |
+| `code` | `claude` (or `codex` for SVG only) | SVG/HTML → PNG (no image model) |
 
 Resolve backend per `image-gen-backends.md`, then pick the harness column.
 
@@ -41,7 +42,7 @@ Resolve backend per `image-gen-backends.md`, then pick the harness column.
 
 ```bash
 node "$SKILL_DIR/scripts/run-harness.mjs" \
-  --harness <grok|agy|codex> \
+  --harness <grok|agy|claude|codex> \
   --task implement \
   --prompt "<worker assignment>" \
   --cwd "<article-workspace>" \
@@ -53,7 +54,7 @@ node "$SKILL_DIR/scripts/run-harness.mjs" \
 
 | Flag | When |
 |------|------|
-| `--write` | **Required** for `agy` and `codex` when the worker must save PNGs (passes `--dangerously-skip-permissions` to agy) |
+| `--write` | **Required** for `agy`, `claude`, and `codex` when the worker must save PNGs (`--dangerously-skip-permissions` on agy/claude) |
 | `--raw-prompt` | Optional for `agy` one-shot when the assignment is already self-contained |
 | `--model "Gemini 3.1 Pro (High)"` | **Recommended** for `agy` image generation |
 | `--mode native` | Long multi-image batches in one harness session |
@@ -127,15 +128,45 @@ node "$SKILL_DIR/scripts/run-harness.mjs" \
   --json
 ```
 
-### code worker instructions
+### code worker instructions (Claude Code — default)
+
+Claude has no image model. The worker writes SVG/HTML and renders to PNG.
 
 ```markdown
-## Backend instructions (code)
+## Backend instructions (code / claude)
 - Build a self-contained HTML file at 1920×1080 with hand-drawn SVG/CSS aesthetic.
-- English labels must be exact HTML text.
+- Prefer inline SVG for Inky and props; use HTML text for English labels (exact spelling).
 - Render to PNG (Playwright screenshot or headless Chrome).
 - Save to the output path.
 - Follow references/style-dna.md and references/inky-ip.md.
+- Do not call image_gen or any image API — this is a code-only path.
+```
+
+Router invocation (native prompting — **never** `claude -p`):
+
+```bash
+node "$SKILL_DIR/scripts/run-harness.mjs" \
+  --harness claude \
+  --task implement \
+  --write \
+  --prompt "<worker assignment>" \
+  --cwd "<workspace>" \
+  --json
+```
+
+`run-harness.mjs` launches Claude via the tmux native bridge with the prompt as a direct CLI argument.
+
+### codex-imagine worker instructions
+
+Codex has a **native raster** path — not SVG. Same class as Grok `image_gen`.
+
+```markdown
+## Backend instructions (codex-imagine)
+- Load the Codex `imagegen` skill (system skill under $CODEX_HOME/skills/.system/imagegen).
+- Call built-in `image_gen` with aspect_ratio 16:9 and the full image spec above.
+- Copy from $CODEX_HOME/generated_images/... to the output path.
+- For edits, use built-in `image_gen` edit mode with the source path.
+- Do not build SVG/HTML for this backend — that is the separate `code` backend.
 ```
 
 Router invocation:
@@ -146,6 +177,20 @@ node "$SKILL_DIR/scripts/run-harness.mjs" \
   --task implement \
   --write \
   --prompt "<worker assignment>" \
+  --cwd "<workspace>" \
+  --json
+```
+
+### code worker instructions (Codex — SVG only, explicit)
+
+Same worker spec as Claude. Use only when backend is `code` and harness is `codex` (user asked for "codex svg" / "codex code"). **Do not use `image_gen`.**
+
+```bash
+node "$SKILL_DIR/scripts/run-harness.mjs" \
+  --harness codex \
+  --task implement \
+  --write \
+  --prompt "<worker assignment — SVG/HTML only, no image_gen>" \
   --cwd "<workspace>" \
   --json
 ```
