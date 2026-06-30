@@ -1,83 +1,121 @@
-# Prompt Examples
+# Prompt examples
 
-下面这些 prompt 可以直接复制到 Codex 里使用。
+Copy these prompts into your agent session. Image generation is delegated to Codex, Grok Build, or Agy harness workers — not called directly.
 
-## 只做配图规划
+## Shot list only (no generation)
 
 ```text
-Use $ian-xiaohei-illustrations 先不要生图。
-请分析下面这篇文章哪里值得配图，输出 5 张左右的 shot list。
-每张图写清楚：
-- 放在哪个段落后
-- 图的主题
-- 核心意思
-- 结构类型
-- 小黑在图里做什么
-- 建议元素
-- 建议中文标注词
+Use $ian-xiaohei-illustrations — do not generate images yet.
+Analyze where this article deserves illustrations and output a shot list of ~5 images.
+For each image specify:
+- which paragraph it follows
+- image topic
+- core meaning
+- structure type
+- what Inky is doing
+- suggested elements
+- suggested English label words
 
-<粘贴文章>
+<paste article>
 ```
 
-## 文章正文配图
+## Full article illustrations (Grok Imagine via harness)
 
 ```text
-Use $ian-xiaohei-illustrations 把下面这篇文章生成 4 张小黑怪诞正文配图。
-要求：16:9 横版、纯白背景、黑色手绘线稿、少量红橙蓝中文手写批注。
-每张图只讲一个核心结构，不要做 PPT 信息图，不要可爱卡通。
+Use $ian-xiaohei-illustrations to generate 4 whimsical Inky body illustrations for this article.
+Requirements: 16:9 landscape, pure white background, black hand-drawn line art,
+sparse red/orange/blue English hand-written annotations.
+Delegate to Grok Build harness via use-harness. Use grok imagine.
 
-<粘贴文章>
+<paste article>
 ```
 
-## 长文配图策略
+## Full article illustrations (Gemini via Agy harness)
 
 ```text
-Use $ian-xiaohei-illustrations 给这篇长文做配图策略。
-不要平均配图，只挑认知锚点：核心判断、输入输出闭环、前后对比、常见坑、承接路径。
-默认 6-8 张，先输出 shot list，不要生成图片。
+Use $ian-xiaohei-illustrations to generate 4 whimsical Inky body illustrations for this article.
+English labels only. Delegate to Agy harness via use-harness with --write. Use gemini nano banana.
 
-<粘贴文章>
+<paste article>
 ```
 
-## 单个观点生成一张图
+## Code imagegen (Codex harness)
 
 ```text
-Use $ian-xiaohei-illustrations 为这个观点生成一张 16:9 正文配图：
+Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Delegate to Codex harness via use-harness with --write.
+Build HTML/SVG, render to PNG. Labels must be exact English.
 
-信任不是喊出来的，而是一块证据一块证据铺过去。
-
-画面要怪诞但清爽，小黑必须承担核心动作。
-中文标注最多 5 个，短一点。
+<paste article>
 ```
 
-## 工作流主题
+## Long-article strategy
 
 ```text
-Use $ian-xiaohei-illustrations 为“把一条原始素材加工成流量、信任、转化三种内容”生成一张图。
-不要画正式流程图，不要复刻一鱼多吃旧案例。
-请重新发明一个新的低科技隐喻，让小黑参与核心动作。
+Use $ian-xiaohei-illustrations to plan illustrations for this long article.
+Don't illustrate evenly — pick cognitive anchors only: core judgment, input/output loop,
+before/after, common pitfalls, handoff path.
+Output 6-8 shot list items. Do not generate images yet.
+
+<paste article>
 ```
 
-## 改图：去掉标题
+## Single concept, one image
 
 ```text
-Use $ian-xiaohei-illustrations 帮我编辑这张图。
-去掉左上角的“Workflow / 流程图”标题和下划线，其他内容保持不变。
-不要新增任何文字或物件。
+Use $ian-xiaohei-illustrations to generate one 16:9 body illustration for:
+
+Trust isn't shouted — it's laid down one piece of evidence at a time.
+
+Whimsical but clean. Inky must carry the core action.
+At most 5 English labels. Delegate to Grok harness via use-harness.
 ```
 
-## 改图：增强小黑参与感
+## Workflow theme
 
 ```text
-Use $ian-xiaohei-illustrations 这张图方向对，但小黑有点像装饰。
-请保持核心意思不变，重生成一版：让小黑成为真正推动结构运转的人。
-画面更怪一点，但仍然纯白、清爽、少字。
+Use $ian-xiaohei-illustrations to illustrate:
+"Turn one raw asset into traffic, trust, and conversion content."
+No formal flowchart. Don't copy the one-fish-many-uses old case.
+Invent a new low-tech metaphor. Delegate to Agy harness via use-harness with --write.
 ```
 
-## 生成一组风格样片
+## Edit: remove title
 
 ```text
-Use $ian-xiaohei-illustrations 输出 5 个不同主题的小黑正文配图效果。
-主题分别覆盖：信息过载、产品验证、内容复利、一人公司、信任建立。
-每张单独生成，不要拼成一张。
+Use $ian-xiaohei-illustrations to edit this image.
+Remove the "Workflow / Flowchart" title and underline in the top-left corner.
+Keep everything else unchanged. Delegate to Grok harness (image_edit).
+```
+
+## Edit: strengthen Inky
+
+```text
+Use $ian-xiaohei-illustrations — this image is close but Inky feels decorative.
+Regenerate with the same core meaning: Inky should drive the structure.
+Delegate to Agy harness via use-harness with --write.
+```
+
+## Set backend via environment
+
+```bash
+export EXPLAINER_IMAGE_BACKEND=code
+SKILL_DIR="$(./scripts/harness-dir.sh)"
+```
+
+```text
+Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Backend is code — delegate to Codex harness with --write.
+```
+
+## Manual harness invocation (orchestrator pattern)
+
+```bash
+SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
+
+node "$SKILL_DIR/scripts/run-harness.mjs" \
+  --harness grok --task implement \
+  --prompt "Generate one 16:9 Inky illustration. Save to assets/my-article-illustrations/01-trust-bridge.png. <full spec>" \
+  --cwd /path/to/article-workspace \
+  --json
 ```

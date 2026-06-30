@@ -1,91 +1,91 @@
-# 构图模式与原创规则
+# Composition patterns and originality rules
 
-## 基础结构类型
+## Base structure types
 
-选择一种结构即可，不要混太多。
+Pick one structure — don't mix too many.
 
-### Workflow 流程
+### Workflow
 
-适合：输入 -> 处理 -> 输出，内容生产，AI 工作流，自动化链路。
+For: input → process → output, content production, AI workflows, automation chains.
 
-画法：左侧输入，中间小黑或怪机器处理，右侧输出，橙色箭头表达主流向。
+Draw: input on the left, Inky or a weird machine in the middle, output on the right; orange arrows for main flow.
 
-### 系统局部
+### System slice
 
-适合：信息来源、过滤器、数据库、渲染器、agent 系统局部。
+For: information sources, filters, databases, renderers, agent system slices.
 
-画法：只画 3-5 个核心模块，小黑参与其中一个关键动作。
+Draw: only 3–5 core modules; Inky performs one key action.
 
-### 前后对比
+### Before / after
 
-适合：混乱/有序，手动/自动，分散/收拢，焦虑/稳定。
+For: chaos/order, manual/auto, scattered/gathered, anxious/stable.
 
-画法：左混乱，右稳定，中间橙色箭头。角色可以更夸张。
+Draw: chaos left, stability right, orange arrow between. Character states can be more exaggerated.
 
-### 角色状态
+### Role state
 
-适合：用户痛点、创作者状态、工具太多、信息焦虑、卡住到跑起来。
+For: user pain points, creator state, too many tools, information anxiety, stuck → running.
 
-画法：2-4 个小状态，每个状态一个短标注。
+Draw: 2–4 small states, one short label each.
 
-### 概念隐喻
+### Concept metaphor
 
-适合：内容工厂、信息仓库、脑内黑盒、工作流机器、自动日报。
+For: content factory, information warehouse, brain black box, workflow machine, auto daily report.
 
-画法：一个大的怪物件或机器，少量输入，一个输出。要有记忆点。
+Draw: one large weird object or machine, few inputs, one output. Must be memorable.
 
-### 方法分层
+### Method layers
 
-适合：方法论框架、系统层级、能力栈、内容系统分层。
+For: methodology frameworks, system tiers, capability stacks, content system layers.
 
-画法：一层层盒子，不要正式金字塔；小黑在旁边搬砖或搭建。
+Draw: stacked boxes — not a formal pyramid; Inky bricklaying or building nearby.
 
-### 地图路线
+### Map route
 
-适合：从想法到上线、用户路径、内容承接路径、学习路线。
+For: idea to launch, user path, content handoff path, learning route.
 
-画法：一条弯曲路径，少量节点，小黑牵线或走路。
+Draw: one winding path, few nodes; Inky pulling the line or walking.
 
-### 小漫画分镜
+### Mini-comic panels
 
-适合：失败到成功、真实过程、吐槽、使用前后变化。
+For: failure to success, real process, venting, before/after usage.
 
-画法：2-4 个小场景，每格只表达一个动作。
+Draw: 2–4 small scenes, one action per panel.
 
-## 原创隐喻生成法
+## Original metaphor method
 
-每次都从当前文章重新发明隐喻，不能照搬旧图。
+Reinvent from the current article every time — never copy old images.
 
-### 三步
+### Three steps
 
-1. 把抽象概念换成一个物理动作：卡住、漏掉、变重、分拣、沉淀、发酵、开门、折叠、拆包、回流。
-2. 把系统结构换成一个低科技物件：坏掉的机器、纸箱、抽屉、水管、邮筒、怪表盘、秤、井、梯子、奇怪工位。
-3. 让小黑承担动作：不是站旁边，而是卡在机器里、拉错线、守门、搬运、修补、称重、扶梯子、记录、把东西塞进某个怪装置。
+1. Turn the abstract concept into a physical action: stuck, leaking, getting heavy, sorting, settling, fermenting, opening, folding, unpacking, recirculating.
+2. Turn the system structure into a low-tech object: broken machine, cardboard box, drawer, pipe, mailbox, weird dial, scale, well, ladder, strange workstation.
+3. Put Inky in the action: not standing aside — stuck in the machine, pulling the wrong wire, guarding a door, hauling, patching, weighing, holding a ladder, logging, stuffing something into a weird device.
 
-### 可用物件池
+### Object pool
 
-- 纸箱、抽屉、旧机器、漏斗、秤、邮筒、门、井、梯子、水管、线团、闸门、转盘、黑盒、打孔器、压面机、晾衣绳、怪工位。
-- 用时只选 1-2 个，不要堆满。
+- Box, drawer, old machine, funnel, scale, mailbox, door, well, ladder, pipe, yarn ball, gate, turntable, black box, punch, pasta press, clothesline, weird workstation.
+- Use only 1–2 per image — don't pile them up.
 
-### 小黑动作池
+### Inky action pool
 
-- 拉、扛、塞、捞、压、称、缝、剪、拧、守、推、接、拆、标记、回收。
-- 动作要服务核心意思，不要为了怪而怪。
+- Pull, carry, stuff, scoop, press, weigh, sew, cut, twist, guard, push, catch, unpack, mark, recycle.
+- Action must serve the core meaning — weird for a reason, not weird for weird's sake.
 
-## 反复刻规则
+## Anti-cliché rules
 
-不要默认打开或复刻 `assets/examples/`。这些图片只用于风格校准，例如线条密度、留白、颜色克制、小黑气质。
+Do not open or copy `assets/examples/` by default. Those images only calibrate style: line density, whitespace, color restraint, Inky temperament.
 
-除非用户明确说“照这张 / 复刻这个构图 / 用这个案例改”，否则不要直接复用这些旧构图：
+Unless the user explicitly says "copy this composition / use this case as base," do not reuse these old layouts:
 
-- 传送带两个断点
-- 小黑在内容机器里拉判断杆
-- 小黑变漏斗分拣流量/信任/转化
-- 小黑切素材鱼
-- 小黑牵承接路径
-- 小黑拉三层信息源
-- 三个小黑分别拿喇叭/搭桥/开门
-- 小黑盖章话术工具箱
-- 小黑举牌看常见坑路径
+- Conveyor with two breakpoints
+- Inky pulling a judgment lever inside a content machine
+- Inky as funnel sorting traffic/trust/conversion
+- Inky cutting a material fish
+- Inky leading a handoff path
+- Inky pulling three information sources
+- Three Inkies with megaphone/bridge/door
+- Inky stamping a handoff toolbox
+- Inky with warning sign on a pitfalls path
 
-同类主题也要换新隐喻。例如“承接路径”不一定画路线，可以画小黑把内容尾巴接到门把手；“一鱼多吃”不一定画鱼，可以画小黑把一个纸团压成几种形状。
+Same theme, new metaphor. "Handoff path" doesn't have to be a path — Inky could attach a content tail to a door handle. "One source, many uses" doesn't need a fish — Inky could press one paper ball into several shapes.

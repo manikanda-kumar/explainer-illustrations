@@ -1,106 +1,148 @@
 ---
 name: ian-xiaohei-illustrations
-description: 生成 Ian 风格的中文正文配图。用于用户要求为中文文章、帖子、博客、Notion 文档、工作流文档、方法论、流程、结构、状态、隐喻或观点生成“怪诞”“小黑”“手绘”“正文配图”“文章插图”“配图建议”“shot list”“去标题/改图”等任务；默认使用小黑 IP、纯白手绘、少量红橙蓝批注、简洁清爽但天马行空的视觉风格。
+description: Generate Ian-style body illustrations for articles. Use when the user asks for "Inky", "Xiaohei" (legacy alias), "hand-drawn", "weird/whimsical", "body illustration", "article illustration", "illustration advice", "shot list", "explainer illustration", or "remove-title / edit image" tasks for an article, post, blog, Notion doc, workflow doc, methodology, process, structure, state, metaphor, or argument. Default visual IP is Inky — pure-white hand-drawn line art, sparse red/orange/blue English annotations, clean but imaginative. Delegates image generation to Codex, Grok Build, or Agy harness workers via use-harness (never direct image_gen/CLI from the orchestrator).
 ---
 
-# Ian 小黑怪诞正文配图
+# Explainer Illustrations (Inky)
 
-## 核心定位
+## Hard rules (always)
 
-为中文文章设计和生成 16:9 横版正文配图。目标不是做商业插画、PPT 信息图或可爱卡通，而是把文章里的关键判断、流程、结构、状态或隐喻，变成一张清爽、怪诞、有创意、可读但不说明书的手绘解释图。
+1. **English only.** Every response, shot list, and embedded label inside images is English. The source article may be any language; illustrations and your prose are English.
+2. **Delegate all image generation via bundled `use-harness`.** Load `<repo>/use-harness/SKILL.md` (shipped in this repository). The orchestrator plans and assigns; harness workers generate. **Never** call `image_gen`, `agy`, or `codex` directly from this agent.
+3. **Backend → harness:** `grok-imagine` → `--harness grok`; `gemini-nano-banana` → `--harness agy --write`; `code` → `--harness codex --write`. Use `--task implement` (not `--task image`). See `references/harness-delegation.md`.
+4. **One image per harness invocation** (default). Do not stitch multiple illustrations into a single image.
 
-默认视觉 IP 是“小黑”：黑色实心、白点眼、细腿、空表情，认真做一件荒诞但成立的事。小黑必须参与画面的核心动作，不能只是站在旁边当装饰。
+## Core positioning
 
-## 先读这些参考
+Design and generate 16:9 landscape body illustrations for articles. The goal is not commercial illustration, PPT infographics, or cute cartoons — it is to turn the article's key judgments, processes, structures, states, or metaphors into a clean, whimsical, creative, readable (but not manual-like) hand-drawn explanation image.
 
-按任务需要读取，不要一次塞满上下文：
+The default visual IP is **Inky**: solid black body, white dot eyes, thin legs, blank expression, earnestly doing one absurd-but-coherent thing. Inky must take part in the core action of the frame, never just stand beside it as decoration.
 
-- `references/style-dna.md`：风格 DNA、颜色、文字、禁忌。
-- `references/xiaohei-ip.md`：小黑 IP 的形象、性格、动作库和禁忌。
-- `references/composition-patterns.md`：结构类型、原创隐喻方法和反复刻规则。
-- `references/prompt-template.md`：单张生图提示词模板。
-- `references/qa-checklist.md`：生成后检查和迭代规则。
-- `assets/examples/`：只作低频视觉校准，不进入默认生成路径。不要照抄这些案例的构图、物件或标注。
+## Read these references first
 
-## 工作流
+Read as the task needs; do not load all at once:
 
-### 1. 消化正文
+- `references/harness-delegation.md`: use-harness router commands, worker assignments, orchestrator workflow.
+- `references/image-gen-backends.md`: backend → harness mapping and preference resolution.
+- `references/style-dna.md`: style DNA, color, text, taboos.
+- `references/inky-ip.md`: Inky's form, personality, action library, taboos.
+- `references/composition-patterns.md`: structure types, original-metaphor method, anti-cliché rules.
+- `references/prompt-template.md`: single-image prompt template.
+- `references/qa-checklist.md`: post-generation checks and iteration rules.
+- `assets/examples/`: low-frequency visual calibration only. Do not copy these examples' composition, props, or annotations.
 
-先读用户给的正文、链接、Notion 页面、Markdown 文件或截图内容。提炼：
+## Workflow
 
-- 核心观点是什么
-- 哪些段落承担认知转折
-- 哪些内容适合用图解释
-- 哪些地方只适合文字，不需要图
+### 1. Digest the article
 
-不要平均配图。优先选择“认知锚点”，例如：核心判断、两个断点、输入输出闭环、分流、前后对比、一鱼多吃、承接路径、常见坑、角色状态变化。
+Read the user's article, link, Notion page, Markdown file, or screenshot. Extract:
 
-### 2. 先出配图策略
+- the core argument
+- which paragraphs carry a cognitive turn
+- which content is suited to an image
+- which spots only need words, no image
 
-如果用户只是说“分析怎么配图 / 思考哪些地方需要配图”，先给 shot list。每张图写清楚：
+Do not illustrate evenly. Prioritize cognitive anchors: core judgment, two breakpoints, input/output loop, branching, before/after, one-source-many-uses, handoff path, common pitfalls, role/state change.
 
-- 放在哪个段落后
-- 图的主题
-- 核心意思
-- 结构类型
-- 小黑在图里做什么
-- 建议元素
-- 建议中文标注词
+### 2. Lead with an illustration strategy
 
-默认 4-8 张。文章很短时 1-3 张；长文也不要轻易超过 9 张。够用就好，避免把正文做成画册。
+If the user only asks to analyze where images are needed, give a shot list first. For each image, state (in English):
 
-### 3. 单张生成
+- which paragraph it follows
+- the image topic
+- the core meaning
+- the structure type
+- what Inky is doing
+- suggested elements
+- suggested English annotation words
 
-如果用户明确要求“生成 / 输出 / 做图 / 帮我生成”，不要停下来等确认；用内置 `image_gen` 每张单独生成。不要把多张图拼在一张里。
+Default 4–8 images. Short article: 1–3. Long article: don't casually exceed 9.
 
-每张图只讲一个核心结构。提示词必须包含：
+### 3. Resolve image backend
 
-- 16:9 横版中文正文配图
-- 纯白背景
-- 黑色手绘线稿
-- 少量红色/橙色/蓝色中文手写批注
-- 大量留白
-- 小黑作为核心动作主体
-- 禁止 PPT、商业插画、幼稚可爱、复杂架构、左上角类型标题
+Before generating, pick a backend per `references/image-gen-backends.md`:
 
-不要复刻过往案例。案例只提供风格密度和小黑参与方式，不能直接复用“传送带断点 / 小黑拉线 / 素材鱼 / 盖章工具箱 / 常见坑路径”等已有构图，除非用户明确要求复刻某张图。每次都要从当前文章重新发明一个奇怪但成立的隐喻。
+| User says | Backend |
+|-----------|---------|
+| "code imagegen", "generate with code", "HTML/SVG" | `code` |
+| "grok imagine", "use image_gen", "imagine" | `grok-imagine` |
+| "nano banana", "gemini", "agy" | `gemini-nano-banana` |
 
-### 4. 检查与迭代
+If unspecified, check `EXPLAINER_IMAGE_BACKEND`, then auto-detect, then fall back.
 
-生成后检查 `references/qa-checklist.md`。如果出现以下问题，优先重生成或局部编辑：
+Tell the user which backend and harness you chose (one line).
 
-- 小黑只是装饰
-- 画面太满
-- 太像流程图/PPT
-- 中文太多或错字严重
-- 左上角出现“常见坑/流程图/系统架构图”等标题
-- 画风太可爱、幼稚、死板
-- 背景不是干净白底
+### 4. Delegate single-image generation
 
-### 5. 保存交付
+If the user clearly asks to generate, do not stop to confirm. For each image:
 
-如果用户在 workspace 内工作，把最终图复制到：
+1. Fill `references/prompt-template.md` for that shot.
+2. Build a worker assignment per `references/harness-delegation.md`.
+3. Run `run-harness.mjs` with the mapped harness (`grok`, `agy`, or `codex`).
+4. Verify the PNG exists at the declared path; check `.harness/runs/<run_id>/` on failure.
+
+```bash
+SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
+node "$SKILL_DIR/scripts/run-harness.mjs" \
+  --harness <grok|agy|codex> \
+  --task implement \
+  --prompt "<worker assignment>" \
+  --cwd "<workspace>" \
+  [--model "Gemini 3.1 Pro (High)"] \
+  [--write] \
+  --json
+# --write required for agy and codex when saving PNGs
+```
+
+Each worker assignment must include the image spec:
+
+- 16:9 landscape body illustration
+- pure white background
+- black hand-drawn line art
+- sparse red/orange/blue **English** hand-written annotations
+- lots of whitespace
+- Inky as the core acting subject
+- forbid PPT, commercial illustration, childish-cute, complex architecture, top-left category title
+
+Do not reproduce past examples. Each time, reinvent a strange-but-coherent metaphor from the current article.
+
+### 5. Check and iterate
+
+After generating, check `references/qa-checklist.md`. Regenerate or edit if:
+
+- Inky is only decoration
+- the frame is too full
+- it looks too much like a flowchart/PPT
+- too much text or serious misspellings
+- a top-left category title appears
+- the style is too cute, childish, or stiff
+- the background is not clean white
+
+### 6. Save and deliver
+
+Copy final images into:
 
 ```text
 assets/<article-slug>-illustrations/
 ```
 
-按顺序命名：
+Name in order:
 
 ```text
 01-topic-name.png
 02-topic-name.png
 ```
 
-保留原始生成文件，不要覆盖已有资产，除非用户明确要求替换。
+Keep originals; do not overwrite existing assets unless the user explicitly asks.
 
-## 输出口径
+## Output format
 
-生成前的策略输出要短而准。生成后的交付要包含：
+Pre-generation strategy: short and precise. Post-generation delivery (in English):
 
-- 生成了几张
-- 每张图的用途
-- 保存路径
-- 哪些图最稳，哪些图是可选
+- which backend and harness were used
+- how many images were generated
+- what each image is for
+- save path
+- which images are strongest, which are optional
 
-不要长篇解释风格理论；让图自己说话。
+Don't over-explain style theory; let the images speak.
