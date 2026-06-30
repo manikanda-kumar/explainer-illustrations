@@ -5,19 +5,24 @@ The **orchestrator** (the agent running this skill) plans shot lists and delegat
 ## Hard rules
 
 1. **Never** call `image_gen`, `image_edit`, `agy`, `claude`, or `codex` directly from the orchestrator (including `claude -p`).
-2. **Always** route through the **bundled** `use-harness` skill in this repo (`<repo>/use-harness`). Override with `USE_HARNESS_SKILL_DIR` only when needed.
+2. **Always** route through `use-harness` (sibling skill after `npx skills add`, or `<repo>/use-harness` in a clone). Override with `USE_HARNESS_SKILL_DIR` only when needed.
 3. Use `--task implement` — **`--task image` is rejected** by the harness router.
 4. **One harness invocation per illustration.** Run sequentially unless the user asks for parallel Grok runs.
 5. The orchestrator remains the user-facing manager: synthesize worker output, verify files exist, run QA, report paths.
 
 ## Setup
 
-Resolve the bundled harness router (from repo root):
+Resolve the harness router:
 
 ```bash
+# Repo clone (from repo root)
 SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
-# or, if cwd is not the repo root:
-SKILL_DIR="${USE_HARNESS_SKILL_DIR:-/path/to/explainer-illustrations/use-harness}"
+
+# npx skills install (from inky-illustrations skill directory)
+SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(bash scripts/harness-dir.sh)}"
+
+# Manual override
+SKILL_DIR="${USE_HARNESS_SKILL_DIR:-/path/to/use-harness}"
 ```
 
 Load `use-harness/SKILL.md` before delegating. Preflight:

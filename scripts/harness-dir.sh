@@ -1,30 +1,22 @@
 #!/usr/bin/env bash
-# Prints the use-harness skill directory (bundled in this repo by default).
+# Repo-root resolver: bundled use-harness, or delegate to inky-illustrations/scripts/harness-dir.sh
 set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [ -n "${USE_HARNESS_SKILL_DIR:-}" ] && [ -d "$USE_HARNESS_SKILL_DIR" ]; then
   printf '%s\n' "$USE_HARNESS_SKILL_DIR"
   exit 0
 fi
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUNDLED="$REPO_ROOT/use-harness"
-
-if [ -f "$BUNDLED/scripts/run-harness.mjs" ]; then
-  printf '%s\n' "$BUNDLED"
+if [ -f "$REPO_ROOT/use-harness/scripts/run-harness.mjs" ]; then
+  printf '%s\n' "$REPO_ROOT/use-harness"
   exit 0
 fi
 
-# Installed as sibling in agent skills dir (e.g. ~/.codex/skills/use-harness)
-for candidate in \
-  "${CODEX_HOME:-$HOME/.codex}/skills/use-harness" \
-  "$HOME/.claude/skills/use-harness" \
-  "$HOME/.agents/skills/use-harness"; do
-  if [ -f "$candidate/scripts/run-harness.mjs" ]; then
-    printf '%s\n' "$candidate"
-    exit 0
-  fi
-done
+if [ -x "$REPO_ROOT/inky-illustrations/scripts/harness-dir.sh" ]; then
+  exec "$REPO_ROOT/inky-illustrations/scripts/harness-dir.sh"
+fi
 
-echo "use-harness not found. Set USE_HARNESS_SKILL_DIR or clone explainer-illustrations." >&2
+echo "use-harness not found. Clone explainer-illustrations or run: npx skills add manikanda-kumar/explainer-illustrations --skill use-harness -g -y" >&2
 exit 1

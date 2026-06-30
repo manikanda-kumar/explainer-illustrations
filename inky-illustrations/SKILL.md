@@ -1,6 +1,6 @@
 ---
-name: ian-xiaohei-illustrations
-description: Generate Ian-style body illustrations for articles. Use when the user asks for "Inky", "Xiaohei" (legacy alias), "hand-drawn", "weird/whimsical", "body illustration", "article illustration", "illustration advice", "shot list", "explainer illustration", or "remove-title / edit image" tasks for an article, post, blog, Notion doc, workflow doc, methodology, process, structure, state, metaphor, or argument. Default visual IP is Inky — pure-white hand-drawn line art, sparse red/orange/blue English annotations, clean but imaginative. Delegates image generation to Grok Build, Agy, Claude Code, or Codex harness workers via use-harness (never direct image_gen/CLI from the orchestrator).
+name: inky-illustrations
+description: Generate Inky body illustrations for articles. Use when the user asks for "Inky", "inky illustrations", "Xiaohei" (legacy alias), "hand-drawn", "weird/whimsical", "body illustration", "article illustration", "illustration advice", "shot list", "explainer illustration", or "remove-title / edit image" tasks for an article, post, blog, Notion doc, workflow doc, methodology, process, structure, state, metaphor, or argument. Default visual IP is Inky — pure-white hand-drawn line art, sparse red/orange/blue English annotations, clean but imaginative. Delegates image generation to Grok Build, Agy, Claude Code, or Codex harness workers via use-harness (never direct image_gen/CLI from the orchestrator).
 ---
 
 # Explainer Illustrations (Inky)
@@ -8,7 +8,7 @@ description: Generate Ian-style body illustrations for articles. Use when the us
 ## Hard rules (always)
 
 1. **English only.** Every response, shot list, and embedded label inside images is English. The source article may be any language; illustrations and your prose are English.
-2. **Delegate all image generation via bundled `use-harness`.** Load `<repo>/use-harness/SKILL.md` (shipped in this repository). The orchestrator plans and assigns; harness workers generate. **Never** call `image_gen`, `agy`, `claude`, or `codex` directly from this agent (never `claude -p`).
+2. **Delegate all image generation via `use-harness`.** Load the sibling `use-harness/SKILL.md` (installed together via `npx skills add`, or bundled in a full repo clone). The orchestrator plans and assigns; harness workers generate. **Never** call `image_gen`, `agy`, `claude`, or `codex` directly from this agent (never `claude -p`).
 3. **Backend → harness:** `grok-imagine` → `--harness grok`; `gemini-nano-banana` → `--harness agy --write`; `codex-imagine` → `--harness codex --write` (native `image_gen`); `code` → `--harness claude --write` (SVG only; codex SVG only when explicit). Claude routes via native tmux bridge — never `claude -p`. Use `--task implement` (not `--task image`). See `references/harness-delegation.md`.
 4. **One image per harness invocation** (default). Do not stitch multiple illustrations into a single image.
 
@@ -27,8 +27,10 @@ Read as the task needs; do not load all at once:
 - `references/style-dna.md`: style DNA, color, text, taboos.
 - `references/inky-ip.md`: Inky's form, personality, action library, taboos.
 - `references/composition-patterns.md`: structure types, original-metaphor method, anti-cliché rules.
+- `references/composition-suggestions.md`: cognitive-anchor routing, complexity budget, shot-list fields, series pacing.
 - `references/prompt-template.md`: single-image prompt template.
 - `references/qa-checklist.md`: post-generation checks and iteration rules.
+- `../review-inky-illustrations/SKILL.md`: formal Block/Approve review (optional; use before publishing).
 - `assets/examples/`: low-frequency visual calibration only. Do not copy these examples' composition, props, or annotations.
 
 ## Workflow
@@ -46,17 +48,23 @@ Do not illustrate evenly. Prioritize cognitive anchors: core judgment, two break
 
 ### 2. Lead with an illustration strategy
 
-If the user only asks to analyze where images are needed, give a shot list first. For each image, state (in English):
+If the user only asks to analyze where images are needed, give a shot list first. Route each anchor with `references/composition-suggestions.md` (cognitive anchor → structure type; when to use HTML/diagram skills instead of Inky).
 
-- which paragraph it follows
-- the image topic
-- the core meaning
-- the structure type
+For each image, state (in English):
+
+- placement (paragraph or section)
+- cognitive anchor (why this spot earns an image)
+- image topic
+- core meaning
+- structure type
+- composition suggestion (zones, flow direction, key objects)
 - what Inky is doing
 - suggested elements
-- suggested English annotation words
+- suggested English annotation words (label budget ≤ 5)
+- optional caption and alt text (for publishing — not burned into the image)
+- avoid (one anti-pattern for this shot)
 
-Default 4–8 images. Short article: 1–3. Long article: don't casually exceed 9.
+Default 4–8 images. Short article: 1–3. Long article: don't casually exceed 9. Vary structure types across the set — see series pacing in `composition-suggestions.md`.
 
 ### 3. Resolve image backend
 
@@ -83,6 +91,8 @@ If the user clearly asks to generate, do not stop to confirm. For each image:
 4. Verify the PNG exists at the declared path; check `.harness/runs/<run_id>/` on failure.
 
 ```bash
+# Repo clone: SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
+# npx install: SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(bash inky-illustrations/scripts/harness-dir.sh)}"
 SKILL_DIR="${USE_HARNESS_SKILL_DIR:-$(./scripts/harness-dir.sh)}"
 node "$SKILL_DIR/scripts/run-harness.mjs" \
   --harness <grok|agy|claude|codex> \
@@ -109,7 +119,9 @@ Do not reproduce past examples. Each time, reinvent a strange-but-coherent metap
 
 ### 5. Check and iterate
 
-After generating, check `references/qa-checklist.md`. Regenerate or edit if:
+After generating, check `references/qa-checklist.md`. For a formal Block/Approve pass before publishing, load `../review-inky-illustrations/SKILL.md` (Before/After/Why table + verdict).
+
+Regenerate or edit if:
 
 - Inky is only decoration
 - the frame is too full

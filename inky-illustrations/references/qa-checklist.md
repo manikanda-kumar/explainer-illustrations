@@ -1,5 +1,7 @@
 # QA checklist
 
+Quick post-generation pass. For a formal Block/Approve review with Before/After/Why findings, use `review-inky-illustrations/SKILL.md` and cite `review-inky-illustrations/STANDARDS.md`.
+
 ## Must pass
 
 - 16:9 landscape.

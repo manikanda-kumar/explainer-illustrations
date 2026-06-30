@@ -1,6 +1,6 @@
 interface:
   display_name: "Explainer Illustrations (Inky)"
   short_description: "Generate whimsical Inky body illustrations — delegates to Grok/Agy/Claude/Codex harness workers via use-harness"
-  default_prompt: "Use $ian-xiaohei-illustrations to design and generate whimsical Inky body illustrations for this article. English labels only."
+  default_prompt: "Use $inky-illustrations to design and generate whimsical Inky body illustrations for this article. English labels only."
 policy:
   allow_implicit_invocation: true

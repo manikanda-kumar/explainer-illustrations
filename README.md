@@ -1,5 +1,7 @@
 # Explainer Illustrations
 
+[![skills.sh](https://skills.sh/b/manikanda-kumar/explainer-illustrations)](https://skills.sh/manikanda-kumar/explainer-illustrations)
+
 > Turn an article's judgments, processes, states, and metaphors into white-background, hand-drawn, whimsical-but-clean body illustrations.
 >
 > 16:9 landscape | Inky mascot IP | pure-white hand-drawn | sparse red/orange/blue English annotations | Agent Skill
@@ -77,7 +79,7 @@ node "$SKILL_DIR/scripts/run-harness.mjs" \
   --cwd . --json
 ```
 
-Use `--task implement` (not `--task image` — rejected by the router). See [harness-delegation.md](ian-xiaohei-illustrations/references/harness-delegation.md) and [image-gen-backends.md](ian-xiaohei-illustrations/references/image-gen-backends.md).
+Use `--task implement` (not `--task image` — rejected by the router). See [harness-delegation.md](inky-illustrations/references/harness-delegation.md) and [image-gen-backends.md](inky-illustrations/references/image-gen-backends.md).
 
 ---
 
@@ -135,37 +137,62 @@ These images are English style calibration samples (Inky whimsical body illustra
 
 ## Install
 
-This repo is self-contained: `use-harness` is bundled at `use-harness/` — no external skill install required.
+### Recommended: `npx skills` (all agents)
+
+Installs to Claude Code, Cursor, Codex, Copilot, Antigravity, and [68+ other agents](https://github.com/vercel-labs/skills#supported-agents) via the [skills CLI](https://skills.sh/docs).
+
+```bash
+# List available skills in this repo
+npx skills add manikanda-kumar/explainer-illustrations --list
+
+# Core install (generation + harness router) — global, all detected agents
+npx skills add manikanda-kumar/explainer-illustrations \
+  --skill inky-illustrations --skill use-harness \
+  -g -y
+
+# Add optional QA reviewer
+npx skills add manikanda-kumar/explainer-illustrations \
+  --skill review-inky-illustrations \
+  -g -y
+
+# Install everything to specific agents only
+npx skills add manikanda-kumar/explainer-illustrations \
+  --skill '*' \
+  -a claude-code -a cursor -a codex -a github-copilot \
+  -g -y
+```
+
+| Skill | Required | Purpose |
+| --- | --- | --- |
+| `inky-illustrations` | Yes | Shot lists, prompts, orchestration |
+| `use-harness` | Yes | Delegates image gen to Grok/Agy/Claude/Codex workers |
+| `review-inky-illustrations` | No | Block/Approve QA before publishing |
+
+Update later:
+
+```bash
+npx skills update inky-illustrations use-harness review-inky-illustrations -g -y
+```
+
+### Alternative: git clone + manual copy
 
 ```bash
 git clone https://github.com/manikanda-kumar/explainer-illustrations.git
 cd explainer-illustrations
 ```
 
-Verify harness CLIs (you need at least one of `grok`, `agy`, `claude`, or `codex` on PATH):
-
 ```bash
-node ./use-harness/scripts/run-harness.mjs doctor --json
-```
-
-Copy both skills into your agent skills directory:
-
-```bash
-# Codex
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./ian-xiaohei-illustrations "${CODEX_HOME:-$HOME/.codex}/skills/"
-cp -R ./use-harness "${CODEX_HOME:-$HOME/.codex}/skills/"
-
-# Claude Code
 mkdir -p "$HOME/.claude/skills"
-cp -R ./ian-xiaohei-illustrations "$HOME/.claude/skills/"
-cp -R ./use-harness "$HOME/.claude/skills/"
+cp -R ./inky-illustrations ./review-inky-illustrations ./use-harness "$HOME/.claude/skills/"
 ```
 
-When working from a clone, resolve the router automatically:
+### Preflight
+
+You need at least one harness CLI on PATH (`grok`, `agy`, `claude`, or `codex`):
 
 ```bash
 SKILL_DIR="$(./scripts/harness-dir.sh)"
+node "$SKILL_DIR/scripts/run-harness.mjs" doctor --json
 ```
 
 Optional environment:
@@ -173,14 +200,13 @@ Optional environment:
 ```bash
 export EXPLAINER_IMAGE_BACKEND=grok-imagine   # or gemini-nano-banana, codex-imagine, code
 export EXPLAINER_CODE_HARNESS=claude          # when backend=code: claude (default) or codex (SVG only)
-# Only if not using the bundled copy or scripts/harness-dir.sh:
-# export USE_HARNESS_SKILL_DIR="/path/to/explainer-illustrations/use-harness"
+# export USE_HARNESS_SKILL_DIR="/path/to/use-harness"  # manual override
 ```
 
 Then invoke:
 
 ```text
-Use $ian-xiaohei-illustrations to design and generate 5 whimsical Inky body illustrations for this article. English labels only. Use grok imagine.
+Use $inky-illustrations to design and generate 5 whimsical Inky body illustrations for this article. English labels only. Use grok imagine.
 ```
 
 ---
@@ -190,10 +216,11 @@ Use $ian-xiaohei-illustrations to design and generate 5 whimsical Inky body illu
 ### Shot list only (no generation)
 
 ```text
-Use $ian-xiaohei-illustrations — do not generate images yet.
+Use $inky-illustrations — do not generate images yet.
 Analyze where this article deserves illustrations and output a shot list of ~5 images.
-For each image specify: paragraph placement, topic, core meaning, structure type,
-what Inky is doing, suggested elements, and suggested English label words.
+Use composition-suggestions.md for routing and layout. For each image specify:
+placement, cognitive anchor, topic, core meaning, structure type, composition suggestion,
+what Inky is doing, suggested elements, label words (≤ 5), optional caption/alt text, avoid.
 
 <paste article>
 ```
@@ -201,7 +228,7 @@ what Inky is doing, suggested elements, and suggested English label words.
 ### Generate body illustrations
 
 ```text
-Use $ian-xiaohei-illustrations to generate 4 whimsical Inky body illustrations for this article.
+Use $inky-illustrations to generate 4 whimsical Inky body illustrations for this article.
 Requirements: 16:9 landscape, pure white background, black hand-drawn line art,
 sparse red/orange/blue English hand-written annotations. Use gemini nano banana.
 
@@ -211,7 +238,7 @@ sparse red/orange/blue English hand-written annotations. Use gemini nano banana.
 ### Single concept, one image
 
 ```text
-Use $ian-xiaohei-illustrations to generate one body illustration for:
+Use $inky-illustrations to generate one body illustration for:
 "Trust isn't shouted — it's laid down one piece of evidence at a time."
 Whimsical but clean. Inky must carry the core action. Use code imagegen.
 ```
@@ -219,8 +246,17 @@ Whimsical but clean. Inky must carry the core action. Use code imagegen.
 ### Edit: remove a title
 
 ```text
-Use $ian-xiaohei-illustrations to edit this image.
+Use $inky-illustrations to edit this image.
 Remove the "Flowchart" title in the top-left corner. Keep everything else unchanged.
+```
+
+### Review before publishing
+
+```text
+Use $review-inky-illustrations to review these generated images and the shot list.
+Output the Before/After/Why table and Block or Approve.
+
+<attach PNGs or paths under assets/my-article-illustrations/>
 ```
 
 More examples in [examples/prompts.md](examples/prompts.md).
@@ -231,12 +267,12 @@ More examples in [examples/prompts.md](examples/prompts.md).
 
 1. Read the article, Markdown, Notion content, screenshot, or user-provided topic
 2. Extract core argument, cognitive turns, process structure, and visually suitable paragraphs
-3. Output a shot list first — one cognitive anchor per image
+3. Output a shot list first — one cognitive anchor per image (see [composition-suggestions.md](inky-illustrations/references/composition-suggestions.md) for routing, label budget, and series pacing)
 4. Pick a structure type: Workflow, system slice, before/after, role state, concept metaphor, method layers, map route, or mini-comic panels
 5. Invent a low-tech, whimsical-but-coherent physical metaphor
 6. Put Inky in the core action
-7. Delegate each image to a harness worker via use-harness (see [harness-delegation.md](ian-xiaohei-illustrations/references/harness-delegation.md))
-8. QA per checklist: white background, whitespace, Inky action, English labels, no PPT feel, no old-case copy
+7. Delegate each image to a harness worker via use-harness (see [harness-delegation.md](inky-illustrations/references/harness-delegation.md))
+8. QA per checklist; optional formal review via `$review-inky-illustrations` (Block/Approve)
 9. Save final PNGs and report usage and paths
 
 ---
@@ -262,8 +298,13 @@ More examples in [examples/prompts.md](examples/prompts.md).
 │   │   ├── 02-sort-by-purpose.png
 │   │   └── ...
 │   └── prompts.md
-└── ian-xiaohei-illustrations/
+├── review-inky-illustrations/   # Block/Approve QA skill (opt-in)
+│   ├── SKILL.md
+│   └── STANDARDS.md
+└── inky-illustrations/
     ├── SKILL.md
+    ├── scripts/
+    │   └── harness-dir.sh
     ├── agents/
     │   └── openai.yaml
     ├── assets/
@@ -272,13 +313,14 @@ More examples in [examples/prompts.md](examples/prompts.md).
         ├── style-dna.md
         ├── inky-ip.md
         ├── composition-patterns.md
+        ├── composition-suggestions.md
         ├── prompt-template.md
         ├── image-gen-backends.md
         ├── harness-delegation.md
         └── qa-checklist.md
 ```
 
-Install `ian-xiaohei-illustrations/` and `use-harness/` into your agent skills folder (or work from a full clone and use `scripts/harness-dir.sh`). The root README, LICENSE, NOTICE, and examples are GitHub sharing docs.
+Install via `npx skills add manikanda-kumar/explainer-illustrations` (recommended) or copy `inky-illustrations/`, `review-inky-illustrations/`, and `use-harness/` into your agent skills folder. The root README, LICENSE, NOTICE, and examples are GitHub sharing docs.
 
 ---
 

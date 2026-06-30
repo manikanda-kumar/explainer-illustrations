@@ -1,5 +1,7 @@
 # Composition patterns and originality rules
 
+For cognitive-anchor routing, shot-list fields, complexity limits, and multi-image pacing, see `composition-suggestions.md`.
+
 ## Base structure types
 
 Pick one structure — don't mix too many.

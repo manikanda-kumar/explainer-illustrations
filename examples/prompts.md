@@ -1,20 +1,45 @@
 # Prompt examples
 
+Install skills first (recommended):
+
+```bash
+npx skills add manikanda-kumar/explainer-illustrations --skill inky-illustrations --skill use-harness -g -y
+```
+
 Copy these prompts into your agent session. Image generation is delegated to Grok Build, Agy, Claude Code, or Codex harness workers — not called directly.
 
 ## Shot list only (no generation)
 
 ```text
-Use $ian-xiaohei-illustrations — do not generate images yet.
+Use $inky-illustrations — do not generate images yet.
 Analyze where this article deserves illustrations and output a shot list of ~5 images.
+Use composition-suggestions.md: route cognitive anchors to structure types, flag paragraphs
+that should use HTML diagrams instead of Inky, and vary layouts across the set.
 For each image specify:
-- which paragraph it follows
+- placement (paragraph or section)
+- cognitive anchor
 - image topic
 - core meaning
 - structure type
+- composition suggestion (zones, flow, key objects)
 - what Inky is doing
 - suggested elements
-- suggested English label words
+- suggested English label words (≤ 5)
+- optional caption and alt text
+- avoid (one anti-pattern)
+
+<paste article>
+```
+
+## Composition suggestions only
+
+```text
+Use $inky-illustrations — shot list and composition suggestions only, no generation.
+For this article:
+1. List cognitive anchors (not every section).
+2. For each anchor, recommend structure type + composition recipe per composition-suggestions.md.
+3. Flag any paragraphs better served by architecture/ERD/HTML explainers (not Inky).
+4. Propose series pacing (thesis → turns → outcome) for a 4–6 image set.
 
 <paste article>
 ```
@@ -22,7 +47,7 @@ For each image specify:
 ## Full article illustrations (Grok Imagine via harness)
 
 ```text
-Use $ian-xiaohei-illustrations to generate 4 whimsical Inky body illustrations for this article.
+Use $inky-illustrations to generate 4 whimsical Inky body illustrations for this article.
 Requirements: 16:9 landscape, pure white background, black hand-drawn line art,
 sparse red/orange/blue English hand-written annotations.
 Delegate to Grok Build harness via use-harness. Use grok imagine.
@@ -33,7 +58,7 @@ Delegate to Grok Build harness via use-harness. Use grok imagine.
 ## Full article illustrations (Gemini via Agy harness)
 
 ```text
-Use $ian-xiaohei-illustrations to generate 4 whimsical Inky body illustrations for this article.
+Use $inky-illustrations to generate 4 whimsical Inky body illustrations for this article.
 English labels only. Delegate to Agy harness via use-harness with --write. Use gemini nano banana.
 
 <paste article>
@@ -42,7 +67,7 @@ English labels only. Delegate to Agy harness via use-harness with --write. Use g
 ## Code imagegen (Claude Code harness — SVG)
 
 ```text
-Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Use $inky-illustrations to generate 3 illustrations for this article.
 Delegate to Claude Code harness via use-harness with --write.
 Build SVG/HTML, render to PNG. Labels must be exact English. Use claude code — native prompting only.
 
@@ -52,7 +77,7 @@ Build SVG/HTML, render to PNG. Labels must be exact English. Use claude code —
 ## Codex Imagine (native image_gen — raster)
 
 ```text
-Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Use $inky-illustrations to generate 3 illustrations for this article.
 Delegate to Codex harness via use-harness with --write. Use codex imagine.
 Call built-in image_gen (not SVG). English labels, 16:9.
 
@@ -62,7 +87,7 @@ Call built-in image_gen (not SVG). English labels, 16:9.
 ## Code imagegen (Codex harness — SVG only, explicit)
 
 ```text
-Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Use $inky-illustrations to generate 3 illustrations for this article.
 Delegate to Codex harness via use-harness with --write. Use codex code / SVG path.
 Build HTML/SVG, render to PNG. Do not use image_gen. Labels must be exact English.
 
@@ -72,7 +97,7 @@ Build HTML/SVG, render to PNG. Do not use image_gen. Labels must be exact Englis
 ## Long-article strategy
 
 ```text
-Use $ian-xiaohei-illustrations to plan illustrations for this long article.
+Use $inky-illustrations to plan illustrations for this long article.
 Don't illustrate evenly — pick cognitive anchors only: core judgment, input/output loop,
 before/after, common pitfalls, handoff path.
 Output 6-8 shot list items. Do not generate images yet.
@@ -83,7 +108,7 @@ Output 6-8 shot list items. Do not generate images yet.
 ## Single concept, one image
 
 ```text
-Use $ian-xiaohei-illustrations to generate one 16:9 body illustration for:
+Use $inky-illustrations to generate one 16:9 body illustration for:
 
 Trust isn't shouted — it's laid down one piece of evidence at a time.
 
@@ -94,7 +119,7 @@ At most 5 English labels. Delegate to Grok harness via use-harness.
 ## Workflow theme
 
 ```text
-Use $ian-xiaohei-illustrations to illustrate:
+Use $inky-illustrations to illustrate:
 "Turn one raw asset into traffic, trust, and conversion content."
 No formal flowchart. Don't copy the one-fish-many-uses old case.
 Invent a new low-tech metaphor. Delegate to Agy harness via use-harness with --write.
@@ -103,7 +128,7 @@ Invent a new low-tech metaphor. Delegate to Agy harness via use-harness with --w
 ## Edit: remove title
 
 ```text
-Use $ian-xiaohei-illustrations to edit this image.
+Use $inky-illustrations to edit this image.
 Remove the "Workflow / Flowchart" title and underline in the top-left corner.
 Keep everything else unchanged. Delegate to Grok harness (image_edit).
 ```
@@ -111,7 +136,7 @@ Keep everything else unchanged. Delegate to Grok harness (image_edit).
 ## Edit: strengthen Inky
 
 ```text
-Use $ian-xiaohei-illustrations — this image is close but Inky feels decorative.
+Use $inky-illustrations — this image is close but Inky feels decorative.
 Regenerate with the same core meaning: Inky should drive the structure.
 Delegate to Agy harness via use-harness with --write.
 ```
@@ -125,8 +150,28 @@ SKILL_DIR="$(./scripts/harness-dir.sh)"
 ```
 
 ```text
-Use $ian-xiaohei-illustrations to generate 3 illustrations for this article.
+Use $inky-illustrations to generate 3 illustrations for this article.
 Backend is code — delegate to Claude Code harness with --write (SVG, no image model).
+```
+
+## Review before publishing
+
+```text
+Use $review-inky-illustrations to review the shot list and generated images.
+Output the Before/After/Why table and Block or Approve.
+
+Shot list: <paste or attach>
+Images: assets/my-article-illustrations/*.png
+```
+
+## Review shot list only (pre-generation)
+
+```text
+Use $review-inky-illustrations — no images yet.
+Review this shot list for cognitive-anchor fit, label budgets, routing mistakes,
+and series pacing. Block or Approve.
+
+<paste shot list>
 ```
 
 ## Manual harness invocation (orchestrator pattern)
